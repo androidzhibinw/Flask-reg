@@ -1,29 +1,32 @@
 {% extends "layout.html" %}
 {% block body %}
 <form action="./" method="post">
+<div class="col-xs-offset-2 col-md-offset-4 col-xs-8 col-md-3">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Login with Phone Number</h3>
+  </div>
+<div class="panel-body">
     <div class="row top-buffer">
     <div class="form-group">
-        <div class="col-xs-offset-2 col-md-offset-4 col-xs-8 col-md-3">
             <input type="text" class="form-control " placeholder="请输入手机号码">
-        </div>
     </div>
 </div>
 <div class="row top-buffer">
         <div class="form-group">
-            <div class="col-xs-offset-2 col-md-offset-4 col-xs-8 col-md-3">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="动态密码">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-info">发送动态密码</button>
                     </span>
                 </div>
-            </div>
         </div>
 </div>
 <div class="row top-buffer">
-     <div class="form-group col-xs-offset-2 col-md-offset-4 col-xs-8 col-md-3">
          <button type="button" class="btn btn-primary btn-block">登录</button>
-     </div>
+</div>
+</div>
+</div>
 </div>
 </form>
 {% endblock %}
