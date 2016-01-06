@@ -1,4 +1,5 @@
 from flask import Flask,render_template,redirect,make_response,request
+import datetime
 app = Flask(__name__)
 @app.route('/')
 def index():
@@ -28,7 +29,8 @@ def getip():
 def login():
     #check phonenumber with security code.
     resp = make_response(redirect('/'))
-    resp.set_cookie('username', 'myname')
+    expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
+    resp.set_cookie('username', 'myname',expires=expire_date)
     #set cookie
     return resp
 
