@@ -1,6 +1,10 @@
 from flask import Flask,render_template,redirect,make_response,request
 import datetime
+import random
 app = Flask(__name__)
+RANDOM_MIN=100000
+RANDOM_MAX=999999
+
 @app.route('/')
 def index():
     #check cookie, if not set render register
@@ -12,7 +16,8 @@ def index():
         return  render_template('home.html')
 
 def genSecCode(number):
-    return '123456'
+    rand_no=random.randint(RANDOM_MIN,RANDOM_MAX)
+    return rand_no
 
 @app.route('/getcode')
 def getcode():
