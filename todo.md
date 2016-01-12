@@ -3,6 +3,7 @@
 - disable login button until phonenumber and code input.
 - send request when click send code button.
 - send request when click login button.
+
 ### backend:
 - handle request from send code button.(gen code,insert to db, send sms)
 - create db table for code varify.
