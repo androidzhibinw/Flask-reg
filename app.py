@@ -9,6 +9,7 @@ app = Flask(__name__)
 WORK_Q = Queue.Queue()
 is_serv_ready=False
 CONN=None
+END_STR='\n'
 
 @app.route('/')
 def index():
@@ -63,7 +64,8 @@ def create_serv_sock():
     global is_serv_ready,CONN
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    host = socket.gethostname()
+    #use public ip here.
+    host='127.0.0.1'
     port=2016
     app.logger.info('before bind')
     s.bind((host,port))
@@ -76,7 +78,7 @@ def create_serv_sock():
 
 def send_sms(msg):
     global CONN
-    CONN.send(msg)
+    CONN.send(msg+END_STR)
     app.logger.info('send to client:' +msg)
 
 def prepare_sms_service():
