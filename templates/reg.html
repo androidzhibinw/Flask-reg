@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
-<form action="./" method="post">
-    <div class="row top-buffer">
+<form action="/login" method="post">
+<div class="row top-buffer">
     <div class="form-group">
         <div class="col-xs-offset-2 col-md-offset-4 col-xs-8 col-md-3">
-            <input id="phone" type="text" class="form-control " maxlength="11"  placeholder="请输入手机号码">
+            <input id="phone" type="text" class="form-control " maxlength="11" name="phone-number" placeholder="请输入手机号码">
         </div>
     </div>
 </div>
@@ -12,9 +12,9 @@
         <div class="form-group">
             <div class="col-xs-offset-2 col-md-offset-4 col-xs-8 col-md-3">
                 <div class="input-group">
-                    <input id="code" type="text" class="form-control"maxlength = "6"  placeholder="动态密码">
+                    <input id="code" name="dynamic-code" type="text" class="form-control"maxlength = "6"  placeholder="动态密码">
                     <span class="input-group-btn">
-                        <button id="btn-send" type="button" class="btn btn-info" onClick="countdown()">发送动态密码</button>
+                        <button id="btn-send" name="send-code" type="submit" class="btn btn-info" onClick="countdown();">发送动态密码</button>
                     </span>
                 </div>
             </div>
@@ -22,7 +22,7 @@
 </div>
 <div class="row top-buffer">
      <div class="form-group col-xs-offset-2 col-md-offset-4 col-xs-8 col-md-3">
-         <button id="btn-login" type="button" class="btn btn-primary btn-block">登录</button>
+         <button id="btn-login" name="login" type="submit" class="btn btn-primary btn-block">登录</button>
      </div>
 </div>
 </form>
