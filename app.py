@@ -28,8 +28,21 @@ def genSecCode(number):
 @app.route('/getcode', methods=['POST'])
 def getcode():
     #gen security code , insert to db
-    print request
-    return genSecCode('10086')
+    if request.method == 'POST':
+        try:
+            number = request.json['number']
+            ##FIXME
+            if not number:
+                 raise ValueError('number empty')
+            elif len(number) != 11:
+                raise ValueError('number length invalid')
+            else:
+                code = genSecCode(number)
+                print code
+        except Exception as e:
+            return 'fail', e
+
+    return 'success'
 def getip():
     if request.headers.getlist("X-Forwarded-For"):
         ip = request.headers.getlist("X-Forwarded-For")[0]
