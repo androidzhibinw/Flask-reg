@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/reg-jq.js') }}"></script>
 <form action="/login" method="post">
 <div class="row top-buffer">
     <div class="form-group">
@@ -14,7 +15,7 @@
                 <div class="input-group">
                     <input id="code" name="dynamic-code" type="text" class="form-control"maxlength = "6"  placeholder="动态密码">
                     <span class="input-group-btn">
-                        <button id="btn-send" name="send-code" type="submit" class="btn btn-info" onClick="countdown();">发送动态密码</button>
+                        <button id="btn-send" name="send-code" type="button" class="btn btn-info">发送动态密码</button>
                     </span>
                 </div>
             </div>

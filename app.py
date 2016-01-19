@@ -25,9 +25,10 @@ def genSecCode(number):
     rand_no=random.randint(RANDOM_MIN,RANDOM_MAX)
     return '%d' % rand_no
 
-@app.route('/getcode')
+@app.route('/getcode', methods=['POST'])
 def getcode():
     #gen security code , insert to db
+    print request
     return genSecCode('10086')
 def getip():
     if request.headers.getlist("X-Forwarded-For"):
