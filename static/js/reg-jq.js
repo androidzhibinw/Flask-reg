@@ -2,7 +2,6 @@ $(document).ready(function (){
 var totalSeconds = 60;
 var seconds = totalSeconds;
 var sendBtn;
-
     $('#btn-send').click(function countdown(){
         if(seconds == totalSeconds) {
             console.log("btn-send clicked");
@@ -10,7 +9,7 @@ var sendBtn;
             $.ajax({
                   method: "POST",
                   url: "/getcode",
-                  data: JSON.stringify({"number":phoneNumber},null,4),
+                  data: JSON.stringify({"number":phoneNumber}),
                   contentType:'application/json;charset=UTF-8'
             })
               .done(function( msg ) {

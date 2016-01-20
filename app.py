@@ -30,6 +30,7 @@ def getcode():
     #gen security code , insert to db
     if request.method == 'POST':
         try:
+            app.logger.info('getcode pass in:' + str(request.json))
             number = request.json['number']
             ##FIXME
             if not number:
@@ -67,8 +68,8 @@ def sms_worker():
     app.logger.info('sms worker')
     while True:
         if not CONN:
-            app.logger.info('sms sock connection not ready')
-            time.sleep(5)
+            app.logger.info('sms sock connection not ready sleep 30s')
+            time.sleep(30)
             continue
         item = WORK_Q.get()
         send_sms(item)
