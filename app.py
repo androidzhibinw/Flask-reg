@@ -32,14 +32,11 @@ def getcode():
         try:
             app.logger.info('getcode pass in:' + str(request.json))
             number = request.json['number']
-            ##FIXME
-            if not number:
-                 raise ValueError('number empty')
-            elif len(number) != 11:
-                raise ValueError('number length invalid')
-            else:
+            if check_phonenumber(number):
                 code = genSecCode(number)
                 print code
+            else:
+                return 'fail: number invalid'
         except Exception as e:
             return 'fail', e
 
@@ -51,14 +48,21 @@ def getip():
         ip = request.remote_addr
     print ip
 
-@app.route('/login')
+@app.route('/login',methods=['GET','POST'])
 def login():
-    #check phonenumber with security code.
-    resp = make_response(redirect('/'))
-    expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
-    resp.set_cookie('username', 'myname',expires=expire_date)
-    #set cookie
-    return resp
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        print data
+
+        #resp = make_response(redirect('/'))
+        #expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
+        #resp.set_cookie('username', 'myname',expires=expire_date)
+        #return resp
+    return render_template('reg.html')
+
+
+def check_phonenumber(number):
+    return True
 
 ##for sms service
 def enqueue_sms_request(json):
