@@ -1,3 +1,4 @@
+from flask.ext.sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, redirect, make_response, request
 from threading import Thread
 import datetime
@@ -6,9 +7,14 @@ import socket
 import time
 import Queue
 import json
+
 RANDOM_MIN = 100000
 RANDOM_MAX = 999999
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+db = SQLAlchemy(app)
 
 # for sms service
 WORK_Q = Queue.Queue()
@@ -79,6 +85,10 @@ def send_sms4no(number):
     data['code'] = code
     json_data = json.dumps(data)
     app.logger.info('sms_json' + str(json_data))
+    reg = Register(number,str(code),False)
+    db.session.add(reg)
+    db.session.commit()
+    app.logger.info('insert to db' + str(json_data))
 
 
 def check_phonenumber(number):
@@ -135,6 +145,25 @@ def prepare_sms_service():
     t_work.start()
     WORK_Q.put('test msg 1')
     WORK_Q.put('test msg 2')
+# for db
+
+
+class Register(db.Model):
+    __tablename__ = 'register'
+    id = db.Column(db.Integer, primary_key=True)
+    phone_number = db.Column(db.String, nullable=False)
+    code = db.Column(db.String, nullable=False)
+    verified = db.Column(db.Boolean, nullable=False)
+    created_on = db.Column(db.DateTime, server_default=db.func.now())
+    updated_on = db.Column(
+        db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    def __init__(self, phone_number, code, verified):
+        self.phone_number = phone_number
+        self.code = code
+        self.verified = verified
+    def __repr__(self):
+        return '<Reg: no=%r, code=%r, verified=%>' % (self.phone_number, self.code, self.verified)
+
 if __name__ == '__main__':
     prepare_sms_service()
     app.run(host='0.0.0.0', debug=True, port=8000, use_reloader=False)
