@@ -85,13 +85,23 @@ def send_sms4no(number):
     data['code'] = code
     json_data = json.dumps(data)
     app.logger.info('sms_json' + str(json_data))
-    reg = Register(number,str(code),False)
+    reg = Register(number, str(code), False)
     db.session.add(reg)
     db.session.commit()
     app.logger.info('insert to db' + str(json_data))
 
 
 def check_phonenumber(number):
+    # restrict records <=3
+    now = datetime.datetime.today()
+    yesterday = now + datetime.timedelta(hours=-24)
+    print now, yesterday
+    result = Register.query.filter(Register.phone_number == number and (
+        Register.created_on >= yesterday)).count()
+    app.logger.info(number + 'have recoreds number' + str(result))
+    if result >= 3:
+        return False
+
     return True
 
 # for sms service
@@ -157,10 +167,12 @@ class Register(db.Model):
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(
         db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+
     def __init__(self, phone_number, code, verified):
         self.phone_number = phone_number
         self.code = code
         self.verified = verified
+
     def __repr__(self):
         return '<Reg: no=%r, code=%r, verified=%>' % (self.phone_number, self.code, self.verified)
 
