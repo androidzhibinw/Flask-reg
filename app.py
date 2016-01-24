@@ -33,7 +33,7 @@ def index():
     if not username:
         return render_template('reg.html')
     else:
-        return render_template('home.html')
+        return render_template('home.html', user=username)
 
 
 def genSecCode(number):
@@ -76,14 +76,22 @@ def login():
             number = data['phone-number']
             code = data['dynamic-code']
             app.logger.info('login:' + number + ',' + code)
-
+            yesterday = datetime.datetime.today(
+            ) - datetime.timedelta(hours=SMS_CODE_VALID_TIME_HOUR)
+            res = Register.query.filter((Register.phone_number == number) & (
+                Register.code == code) & (Register.created_on > yesterday)).count()
+            if res == 1:
+                app.logger.info('login success')
+                resp = make_response(redirect('/'))
+                expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
+                resp.set_cookie('username', number, expires=expire_date)
+                return resp
+            else:
+                error = 'phone number or security code not correct !'
+                app.logger.info(error)
         else:
             error = 'press login button to login'
 
-        #resp = make_response(redirect('/'))
-        #expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
-        #resp.set_cookie('username', 'myname',expires=expire_date)
-        # return resp
     return render_template('reg.html', error=error)
 
 
@@ -102,7 +110,6 @@ def send_sms4no(number):
 
 
 def check_phonenumber(number):
-    # restrict records <=3
     now = datetime.datetime.today()
     yesterday = now - datetime.timedelta(hours=SMS_CODE_VALID_TIME_HOUR)
     app.logger.info('yesterday:' + str(yesterday))
