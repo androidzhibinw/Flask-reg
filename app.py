@@ -10,6 +10,8 @@ import json
 
 RANDOM_MIN = 100000
 RANDOM_MAX = 999999
+SMS_CODE_LIMIT = 3
+SMS_CODE_VALID_TIME_HOUR = 24
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -49,7 +51,7 @@ def getcode():
             if check_phonenumber(number):
                 send_sms4no(number)
             else:
-                return 'fail:number invalid'
+                return 'fail:number invalid or time limit'
         except Exception as e:
             return str(e)
 
@@ -66,15 +68,23 @@ def getip():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = ''
     if request.method == 'POST':
         data = request.form.to_dict()
         print data
+        if 'login' in data:
+            number = data['phone-number']
+            code = data['dynamic-code']
+            app.logger.info('login:' + number + ',' + code)
+
+        else:
+            error = 'press login button to login'
 
         #resp = make_response(redirect('/'))
         #expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
         #resp.set_cookie('username', 'myname',expires=expire_date)
         # return resp
-    return render_template('reg.html')
+    return render_template('reg.html', error=error)
 
 
 def send_sms4no(number):
@@ -94,14 +104,13 @@ def send_sms4no(number):
 def check_phonenumber(number):
     # restrict records <=3
     now = datetime.datetime.today()
-    yesterday = now + datetime.timedelta(hours=-24)
-    print now, yesterday
-    result = Register.query.filter(Register.phone_number == number and (
-        Register.created_on >= yesterday)).count()
-    app.logger.info(number + 'have recoreds number' + str(result))
-    if result >= 3:
+    yesterday = now - datetime.timedelta(hours=SMS_CODE_VALID_TIME_HOUR)
+    app.logger.info('yesterday:' + str(yesterday))
+    result = Register.query.filter((Register.phone_number == number) & (
+        Register.created_on > yesterday)).count()
+    app.logger.info(number + ' have recoreds number ' + str(result))
+    if result >= SMS_CODE_LIMIT:
         return False
-
     return True
 
 # for sms service
