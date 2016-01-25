@@ -202,6 +202,14 @@ class User(db.Model):
     updated_on = db.Column(
         db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
+    def __init__(self, phone_number, name):
+        self.phone_number = phone_number
+        self.name = name
+
+    def __repr__(self):
+        return '<User: no=%r, name=%r>' % (self.phone_number, self.name)
+
+
 if __name__ == '__main__':
     prepare_sms_service()
     app.run(host='0.0.0.0', debug=True, port=8000, use_reloader=False)
