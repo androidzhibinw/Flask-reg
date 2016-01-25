@@ -192,6 +192,16 @@ class Register(db.Model):
     def __repr__(self):
         return '<Reg: no=%r, code=%r, verified=%>' % (self.phone_number, self.code, self.verified)
 
+
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    phone_number = db.Column(db.String, unique=True)
+    name = db.Column(db.String)
+    created_on = db.Column(db.DateTime, server_default=db.func.now())
+    updated_on = db.Column(
+        db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+
 if __name__ == '__main__':
     prepare_sms_service()
     app.run(host='0.0.0.0', debug=True, port=8000, use_reloader=False)
