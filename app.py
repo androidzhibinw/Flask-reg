@@ -1,5 +1,5 @@
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, redirect, make_response, request
+from flask import Flask, render_template, redirect, make_response, request, session, url_for
 from threading import Thread
 import datetime
 import random
@@ -17,6 +17,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 db = SQLAlchemy(app)
+app.secret_key = 'test key ..'
 
 # for sms service
 WORK_Q = Queue.Queue()
@@ -25,15 +26,22 @@ CONN = None
 END_STR = '\n'
 
 
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = datetime.timedelta(days=365)
+
+
 @app.route('/')
 def index():
     # check cookie, if not set render register
-    getip()
-    username = request.cookies.get('username')
-    if not username:
-        return render_template('reg.html')
+    app.logger.info('ip:' + str(getip()))
+    app.logger.info('cookies:' + str(request.cookies))
+    #username = request.cookies.get('username')
+    if 'user' in session:
+        return render_template('home.html', user=session['user'])
     else:
-        return render_template('home.html', user=username)
+        return redirect(url_for('login'))
 
 
 def genSecCode(number):
@@ -63,7 +71,7 @@ def getip():
         ip = request.headers.getlist("X-Forwarded-For")[0]
     else:
         ip = request.remote_addr
-    print ip
+    return ip
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -82,10 +90,12 @@ def login():
                 Register.code == code) & (Register.created_on > yesterday)).count()
             if res == 1:
                 app.logger.info('login success')
-                resp = make_response(redirect('/'))
-                expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
-                resp.set_cookie('username', number, expires=expire_date)
-                return resp
+                session['user'] = number
+                #resp = make_response(redirect('/'))
+                #expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
+                #resp.set_cookie('username', number, expires=expire_date)
+                # return resp
+                return redirect(url_for('index'))
             else:
                 error = 'phone number or security code not correct !'
                 app.logger.info(error)
