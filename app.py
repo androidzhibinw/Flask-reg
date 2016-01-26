@@ -41,7 +41,7 @@ def index():
     if 'user' in session:
         return render_template('home.html', user=session['user'])
     else:
-        return redirect(url_for('login'))
+        return render_template('reg.html')
 
 
 def genSecCode(number):
@@ -78,8 +78,10 @@ def getip():
 def login():
     error = ''
     if request.method == 'POST':
+        if 'user' in session:
+            return redirect(url_for('index'))
         data = request.form.to_dict()
-        print data
+        app.logger.info(str(data))
         if 'login' in data:
             number = data['phone-number']
             code = data['dynamic-code']
@@ -90,6 +92,7 @@ def login():
                 Register.code == code) & (Register.created_on > yesterday)).count()
             if res == 1:
                 app.logger.info('login success')
+                add_user(number)
                 session['user'] = number
                 #resp = make_response(redirect('/'))
                 #expire_date = datetime.datetime.now() + datetime.timedelta(days=365)
@@ -102,8 +105,24 @@ def login():
         else:
             error = 'press login button to login'
 
-    return render_template('reg.html', error=error)
+    return redirect(url_for('index'))
+@app.route('/logoutabc')
+def logout():
+    session.pop('user',None)
+    return redirect(url_for('index'))
 
+def add_user(number):
+    count = User.query.filter_by(phone_number=number).count()
+    if count == 0:
+        try:
+            user = User(number,number)
+            db.session.add(user)
+            db.session.commit()
+            app.logger.info('add_user User:' + number)
+        except Exception as e:
+            app.logger.error(str(e))
+    else:
+        app.logger.warning('add_user User:' + number + ' already exist!')
 
 def send_sms4no(number):
     app.logger.info('send_sms4no:' + str(number))
