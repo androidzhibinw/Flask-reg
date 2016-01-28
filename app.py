@@ -12,6 +12,8 @@ RANDOM_MIN = 100000
 RANDOM_MAX = 999999
 SMS_CODE_LIMIT = 3
 SMS_CODE_VALID_TIME_HOUR = 24
+SMS_DATA_JSON_KEY_NUMBER = 'number'
+SMS_DATA_JSON_KEY_CODE = 'code'
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -39,7 +41,7 @@ def index():
     app.logger.info('cookies:' + str(request.cookies))
     #username = request.cookies.get('username')
     if 'user' in session:
-        flash(u'wlecome','info')
+        flash(u'wlecome', 'info')
         return render_template('home.html', user=session['user'])
     else:
         return render_template('reg.html')
@@ -109,16 +111,19 @@ def login():
             flash(error, 'error')
 
     return redirect(url_for('index'))
+
+
 @app.route('/logoutabc')
 def logout():
-    session.pop('user',None)
+    session.pop('user', None)
     return redirect(url_for('index'))
+
 
 def add_user(number):
     count = User.query.filter_by(phone_number=number).count()
     if count == 0:
         try:
-            user = User(number,number)
+            user = User(number, number)
             db.session.add(user)
             db.session.commit()
             app.logger.info('add_user User:' + number)
@@ -127,12 +132,13 @@ def add_user(number):
     else:
         app.logger.warning('add_user User:' + number + ' already exist!')
 
+
 def send_sms4no(number):
     app.logger.info('send_sms4no:' + str(number))
     code = genSecCode(number)
     data = {}
-    data['number'] = number
-    data['code'] = code
+    data[SMS_DATA_JSON_KEY_NUMBER] = number
+    data[SMS_DATA_JSON_KEY_CODE] = code
     json_data = json.dumps(data)
     app.logger.info('sms_json' + str(json_data))
     reg = Register(number, str(code), False)
