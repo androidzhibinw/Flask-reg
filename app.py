@@ -1,5 +1,5 @@
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, redirect, make_response, request, session, url_for
+from flask import Flask, flash, render_template, redirect, make_response, request, session, url_for
 from threading import Thread
 import datetime
 import random
@@ -39,6 +39,7 @@ def index():
     app.logger.info('cookies:' + str(request.cookies))
     #username = request.cookies.get('username')
     if 'user' in session:
+        flash(u'wlecome','info')
         return render_template('home.html', user=session['user'])
     else:
         return render_template('reg.html')
@@ -101,9 +102,11 @@ def login():
                 return redirect(url_for('index'))
             else:
                 error = 'phone number or security code not correct !'
+                flash(error, 'danger')
                 app.logger.info(error)
         else:
             error = 'press login button to login'
+            flash(error, 'error')
 
     return redirect(url_for('index'))
 @app.route('/logoutabc')
