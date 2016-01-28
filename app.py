@@ -139,6 +139,7 @@ def send_sms4no(number):
     db.session.add(reg)
     db.session.commit()
     app.logger.info('insert to db' + str(json_data))
+    enqueue_sms_request(json_data)
 
 
 def check_phonenumber(number):

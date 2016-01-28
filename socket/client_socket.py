@@ -4,7 +4,7 @@ import socket
 
 def local_socket():
     s = socket.socket()
-    host = socket.gethostname()
+    host = '127.0.0.1'
     port=2016
     s.connect((host,port))
     #should have threads for handle request
